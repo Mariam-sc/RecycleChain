@@ -1,2 +1,2 @@
-# contracts
+# RecycleChain
  Solidity smart contracts
