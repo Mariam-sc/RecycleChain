@@ -10,8 +10,8 @@ contract Register{
     //manufacturer
     struct Manufacturer {
     address  manufacturerAddress; 
-    // ADD NAME 
-    string  manufacturerLocation; 
+    string  manufacturerLocation;
+    string manufacturerName;
     bool isExist;
     }
     
@@ -30,6 +30,7 @@ contract Register{
     struct Seller {
         address sellerAddress; 
         string sellerLocation;
+        string sellerName;
         address [] sortingMachineAddress; // dynamic array 
         bool isExist;
     }
@@ -51,16 +52,16 @@ contract Register{
     }
     
     // register manufactuerer if it doesn't exist 
-    function registerManufactuerer (address addr, string memory manufacturerLocation) public onlyGovermentEntity {
+    function registerManufactuerer (address addr, string memory manufacturerLocation,  string memory manufacturerName) public onlyGovermentEntity {
         require(registeredManufacturers[addr].isExist == false , "Manufactuerer is registered already."); 
         
-        registeredManufacturers[addr] = Manufacturer(addr, manufacturerLocation, true);
+        registeredManufacturers[addr] = Manufacturer(addr, manufacturerLocation, manufacturerName, true);
     }
     
     // returns manufacturer details when called from outside the contract 
-    function getManufactuererDetails(address addr) external view returns (address, string memory){
+    function getManufactuererDetails(address addr) external view returns (address, string memory, string memory){
         
-        return(registeredManufacturers[addr].manufacturerAddress, registeredManufacturers[addr].manufacturerLocation);
+        return(registeredManufacturers[addr].manufacturerAddress, registeredManufacturers[addr].manufacturerLocation, registeredManufacturers[addr].manufacturerName);
     }
     
     // register buyer if it doesn't exist 
@@ -77,22 +78,22 @@ contract Register{
     }
     
     // register seller if it doesn't exist 
-    function registerSeller (address addr, string memory sellerLocation, address[] memory sortingMachineAddress) public onlyGovermentEntity {
+    function registerSeller (address addr, string memory sellerLocation, string  memory sellerName, address[] memory sortingMachineAddress) public onlyGovermentEntity {
         require(registeredSellers[addr].isExist == false , "Seller is registered already."); 
         
         registeredSellers[addr].sellerAddress = addr; 
         registeredSellers[addr].sellerLocation = sellerLocation; 
+       registeredSellers[addr].sellerName = sellerName; 
         registeredSellers[addr].isExist = true;
         for (uint256 i =0; i < sortingMachineAddress.length; i++)
         registeredSellers[addr].sortingMachineAddress.push(sortingMachineAddress[i]); 
        
     }
     
-     function getSellerDetails(address addr) external view returns (address, string memory, address [] memory){
+     function getSellerDetails(address addr) external view returns (address, string memory,string memory, address [] memory){
         
-        return(registeredSellers[addr].sellerAddress, registeredSellers[addr].sellerLocation, registeredSellers[addr].sortingMachineAddress);
+        return(registeredSellers[addr].sellerAddress, registeredSellers[addr].sellerLocation,registeredSellers[addr].sellerName, registeredSellers[addr].sortingMachineAddress);
     }
     
     
     
-} 
