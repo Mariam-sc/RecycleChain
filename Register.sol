@@ -90,10 +90,15 @@ contract Register{
        
     }
     
-     function getSellerDetails(address addr) external view returns (address, string memory,string memory, address [] memory){
+     function getSellerDetails(address addr) external view returns (address, string memory,string memory){
         
-        return(registeredSellers[addr].sellerAddress, registeredSellers[addr].sellerLocation,registeredSellers[addr].sellerName, registeredSellers[addr].sortingMachineAddress);
+        return(registeredSellers[addr].sellerAddress, registeredSellers[addr].sellerLocation,registeredSellers[addr].sellerName);
+    }
+    
+    function getSellerSortingmMachineDetails(address addr) external view returns ( address [] memory){
+        return(registeredSellers[addr].sortingMachineAddress); 
     }
     
     
-}
+    
+} 
