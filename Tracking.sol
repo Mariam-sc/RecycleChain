@@ -14,12 +14,10 @@ contract Tracking{
     address public caller; 
      
     //variables for counting plastic bottles scanned in the sorting machine 
-    uint256 bottlesSortedCounter; 
-    uint256 bottlesSortedLimit; 
+    uint256 public bottlesSortedCounter; 
+    uint256 public bottlesSortedLimit; 
+    address [] public plasticBale; 
     
-    address [] plasticBale; 
-    
-    // ADD SOLD STATUS!!!!!!! ==> could be added in plastic bale SC
     
      //constructor - initilize state variables
     constructor() public{
@@ -28,7 +26,7 @@ contract Tracking{
         bottlesSortedCounter = 0;
     }
     
-    //event 
+    //events
     event updateStatusMachine(address plasticBottleAddress, string status, uint time); 
     event updateStatusRecycler(address recycler, address plasticBottleAddress, string status, uint time);
     event plasticBaleCompleted(address [] plasticBale, uint time ); 
@@ -41,20 +39,17 @@ contract Tracking{
        RegisterSC registerSC = RegisterSC(registerContractAddr); //pass contract address 
        tempArray = registerSC.getSellerSortingmMachineDetails(sellerAddr); // pass address of sorting facility-seller
       
-       
+      
        for(uint256 i=0; i< tempArray.length; i++){ //only registered sorting machines can update the status of the bottle 
-           require(caller == tempArray[i],"Sorting machine is not registered.");
-           _;
+       
+         if (caller == tempArray[i])
+          _;
+          
        }
         
    }
    
-   modifier onPlasticBaleCompletion(){
-       require(bottlesSortedCounter == bottlesSortedLimit);
-       _; 
-   }
-   
-   
+  
     function setBottleAddress (address _plasticBotttleAddress) public {  // Paramenter is the scanned address on the bottle
         plasticBottleAddress = _plasticBotttleAddress; 
         
@@ -72,15 +67,22 @@ contract Tracking{
     
     function updateStatusSorted (address registerContractAddr, address sellerAddr) public sortingMachineOnly (registerContractAddr, sellerAddr){
         
-        plasticBale[bottlesSortedCounter++] = plasticBottleAddress;
-        status = 'sorted';
-        emit updateStatusMachine(plasticBottleAddress, status, now); 
+       plasticBale.push(plasticBottleAddress);
+       bottlesSortedCounter++;
+       status = 'sorted';
+       
+       emit updateStatusMachine(plasticBottleAddress, status, now);
+      
+      
+      if(bottlesSortedCounter == bottlesSortedLimit )
+         announcePlasticBaleCompleted(); 
+      
     }
     
-    function createPlasticBaleSC () public  onPlasticBaleCompletion{
-        emit plasticBaleCompleted (plasticBale, now);
+    function announcePlasticBaleCompleted() internal {
+         bottlesSortedCounter =0; 
+         emit plasticBaleCompleted (plasticBale, now); 
+        
     }
-
-    // ADD an event that would be emitted on sorting 1000 bottles 
-   
+    
 }
