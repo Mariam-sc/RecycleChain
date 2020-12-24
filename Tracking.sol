@@ -29,7 +29,7 @@ contract Tracking{
     //events
     event updateStatusMachine(address plasticBottleAddress, string status, uint time); 
     event updateStatusRecycler(address recycler, address plasticBottleAddress, string status, uint time);
-    event plasticBaleCompleted(address [] plasticBale, address [] plasticBaleContributorsAddresses, uint time ); 
+    event plasticBaleCompleted(address [] plasticBale, address [] plasticBaleContributorsAddresses,  uint256 bottlesInBaleNo, uint time ); 
     
     
     modifier sortingMachineOnly (address registerContractAddr, address sellerAddr){
@@ -87,7 +87,7 @@ contract Tracking{
     
     function announcePlasticBaleCompleted() internal {
          bottlesSortedCounter =0; 
-         emit plasticBaleCompleted (plasticBale,plasticBaleContributorsAddresses, now); 
+         emit plasticBaleCompleted (plasticBale,plasticBaleContributorsAddresses, bottlesSortedLimit, now); 
         
     }
     
