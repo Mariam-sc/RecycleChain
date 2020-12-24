@@ -8,7 +8,7 @@ pragma solidity ^0.5.0;
 contract Tracking{
     
     //state variables - stored permanently in contract storage 
-    
+   
     string public status;
     address public plasticBottleAddress; // attained by scanning the QR code
     address public caller; 
@@ -17,7 +17,7 @@ contract Tracking{
     uint256 public bottlesSortedCounter; 
     uint256 public bottlesSortedLimit; 
     address [] public plasticBale; 
-    
+    address [] public plasticBaleContributorsAddresses; 
     
      //constructor - initilize state variables
     constructor() public{
@@ -29,7 +29,7 @@ contract Tracking{
     //events
     event updateStatusMachine(address plasticBottleAddress, string status, uint time); 
     event updateStatusRecycler(address recycler, address plasticBottleAddress, string status, uint time);
-    event plasticBaleCompleted(address [] plasticBale, uint time ); 
+    event plasticBaleCompleted(address [] plasticBale, address [] plasticBaleContributorsAddresses, uint time ); 
     
     
     modifier sortingMachineOnly (address registerContractAddr, address sellerAddr){
@@ -51,7 +51,7 @@ contract Tracking{
    
   
     function setBottleAddress (address _plasticBotttleAddress) public {  // Paramenter is the scanned address on the bottle
-        plasticBottleAddress = _plasticBotttleAddress; 
+        plasticBottleAddress = _plasticBotttleAddress;                   // called first by the recycler then the sorting machine 
         
     }
     
@@ -60,13 +60,19 @@ contract Tracking{
         
     }
     
+    //Key: bottle address
+    mapping(address=>address) bottleToRecycler; 
+    
+    
     function updateStatusDisposed () public{
+        bottleToRecycler[plasticBottleAddress] = caller; //save recycler's address
         status = 'disposed'; 
-          emit updateStatusRecycler (caller, plasticBottleAddress, status, now);
+        emit updateStatusRecycler (caller, plasticBottleAddress, status, now);
     }
     
     function updateStatusSorted (address registerContractAddr, address sellerAddr) public sortingMachineOnly (registerContractAddr, sellerAddr){
         
+       plasticBaleContributorsAddresses.push(bottleToRecycler[plasticBottleAddress]); 
        plasticBale.push(plasticBottleAddress);
        bottlesSortedCounter++;
        status = 'sorted';
@@ -81,7 +87,7 @@ contract Tracking{
     
     function announcePlasticBaleCompleted() internal {
          bottlesSortedCounter =0; 
-         emit plasticBaleCompleted (plasticBale, now); 
+         emit plasticBaleCompleted (plasticBale,plasticBaleContributorsAddresses, now); 
         
     }
     
