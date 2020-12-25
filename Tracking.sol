@@ -14,8 +14,8 @@ contract Tracking{
     address public caller; 
      
     //variables for counting plastic bottles scanned in the sorting machine 
-    uint256 public bottlesSortedCounter; 
-    uint256 public bottlesSortedLimit; 
+    uint public bottlesSortedCounter; 
+    uint public bottlesSortedLimit; 
     address [] public plasticBale; 
     address [] public plasticBaleContributorsAddresses; 
     
@@ -40,7 +40,7 @@ contract Tracking{
        tempArray = registerSC.getSellerSortingmMachineDetails(sellerAddr); // pass address of sorting facility-seller
       
       
-       for(uint256 i=0; i< tempArray.length; i++){ //only registered sorting machines can update the status of the bottle 
+       for(uint i=0; i< tempArray.length; i++){ //only registered sorting machines can update the status of the bottle 
        
          if (caller == tempArray[i])
           _;
