@@ -99,6 +99,9 @@ contract Register{
         return(registeredSellers[addr].sortingMachineAddress); 
     }
     
+    function isBuyerExist(address addr) external view returns (bool){
+        return(registeredBuyers[addr].isExist);
+    }
     
     
 } 
