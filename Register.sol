@@ -85,7 +85,7 @@ contract Register{
         registeredSellers[addr].sellerLocation = sellerLocation; 
        registeredSellers[addr].sellerName = sellerName; 
         registeredSellers[addr].isExist = true;
-        for (uint256 i =0; i < sortingMachineAddress.length; i++)
+        for (uint i =0; i < sortingMachineAddress.length; i++)
         registeredSellers[addr].sortingMachineAddress.push(sortingMachineAddress[i]); 
        
     }
