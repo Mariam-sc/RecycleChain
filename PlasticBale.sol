@@ -152,7 +152,7 @@ contract PlasticBale{
     }
     
     // For debugging 
-     function getTime()  public returns (uint){
+     function getTime()  public view returns (uint){
         return now + 5 minutes; 
     }
     
