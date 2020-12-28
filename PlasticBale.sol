@@ -8,7 +8,7 @@ contract PlasticBale{
     
 
     address[] public plasticBale; // retrived from plasticBaleCompleted event and passed through web3.js
-    address [] public contributors; // retrived from plasticBaleCompleted event and passed through web3.js
+    address payable[] public contributors; // retrived from plasticBaleCompleted event and passed through web3.js
   
  // Bid variables 
       bool public isOpen; 
@@ -33,7 +33,7 @@ contract PlasticBale{
    // Bidders are the Buyers 
    uint totalBidders; 
     
-    constructor(address[] memory _plasticBale, address[] memory _contributors ) public {
+    constructor(address[] memory _plasticBale, address payable[] memory _contributors ) public {
       plasticBale = _plasticBale; 
       contributors = _contributors; 
       auctionOwner = msg.sender; 
@@ -58,6 +58,7 @@ contract PlasticBale{
     event bidderExited(address bidderAddress); 
     event bidderRefunded(address biddeAddress, uint amount); 
     event auctionEnded (address highestBidder, uint highestBid , uint closingTime); 
+    event updateStatusBuyer(address buyer, address plasticBottleAddress, string status, uint time); 
     
     
     function addBidder(address registerContractAddr, address bidderAddr) onlyBidder (registerContractAddr) public {
@@ -127,28 +128,44 @@ contract PlasticBale{
         require(endTime < now, "Auction duration is not up yet.");
         require(highestBidder != address(0), "No bids have been placed"); 
         
-        //close the bid
         isOpen = false; 
         
-        
-        //Calculate shares 
-        
         uint halfAmount = highestBid/2;
-        
+    
         // Pay the seller 
         (auctionOwner).transfer(halfAmount); 
         
         //Calculate each participants' share & reward recyclers 
         
+        address payable[] memory tempArray = contributors; 
+        uint contribution = 0; 
+        uint contributionRate =0; 
+        
+        for(uint i=0; i < tempArray.length; i++){
+             for(uint j=0; j < contributors.length; i++){
+                  if(tempArray[i] == contributors[i]){
+                      contribution++;
+                  }
+             }
+             
+             contributionRate = contribution / (plasticBale.length); 
+             tempArray[i].transfer(contribution * halfAmount); 
+             updateBottleStatus(highestBidder, tempArray[i]); 
+
+        }
         
         emit auctionEnded(highestBidder, highestBid , now); 
     
+    }
+    
+    function updateBottleStatus(address buyerAddress, address plasticBottleAddress) public {
+        
+        emit updateStatusBuyer(buyerAddress, plasticBottleAddress, "sold", now); 
     }
     
     // For debugging 
      function getTime()  public view returns (uint){
         return now + 5 minutes; 
     }
-    
     
 }
