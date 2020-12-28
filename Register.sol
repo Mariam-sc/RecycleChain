@@ -6,12 +6,14 @@ contract Register{
     
     // goverment entity - municipality 
     address public govermentEntity; 
+    uint x; 
     
     //manufacturer
     struct Manufacturer {
     address  manufacturerAddress; 
     string  manufacturerLocation;
     string manufacturerName;
+    uint manufacturerIdenfiter; // used in bottle address production 
     bool isExist;
     }
     
@@ -39,6 +41,7 @@ contract Register{
     //constructor - initilize state variables
     constructor() public{
      govermentEntity = msg.sender; 
+     x = 0; 
     }
     
     // Mappings 
@@ -54,8 +57,8 @@ contract Register{
     // register manufactuerer if it doesn't exist 
     function registerManufactuerer (address addr, string memory manufacturerLocation,  string memory manufacturerName) public onlyGovermentEntity {
         require(registeredManufacturers[addr].isExist == false , "Manufactuerer is registered already."); 
-        
-        registeredManufacturers[addr] = Manufacturer(addr, manufacturerLocation, manufacturerName, true);
+        registeredManufacturers[addr] = Manufacturer(addr, manufacturerLocation, manufacturerName,x, true);
+        x++; // increment idenfitier 
     }
     
     // returns manufacturer details when called from outside the contract 
@@ -85,7 +88,7 @@ contract Register{
         registeredSellers[addr].sellerLocation = sellerLocation; 
        registeredSellers[addr].sellerName = sellerName; 
         registeredSellers[addr].isExist = true;
-        for (uint i =0; i < sortingMachineAddress.length; i++)
+        for (uint256 i =0; i < sortingMachineAddress.length; i++)
         registeredSellers[addr].sortingMachineAddress.push(sortingMachineAddress[i]); 
        
     }
@@ -103,5 +106,8 @@ contract Register{
         return(registeredBuyers[addr].isExist);
     }
     
+   function getManufactuererIdentifier(address manufacturerAddress) external view returns (uint){
+        return registeredManufacturers[manufacturerAddress].manufacturerIdenfiter; 
+   }
     
 } 
