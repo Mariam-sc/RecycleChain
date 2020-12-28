@@ -14,22 +14,21 @@ contract Tracking{
     address public caller; 
      
     //variables for counting plastic bottles scanned in the sorting machine 
-    uint public bottlesSortedCounter; 
-    uint public bottlesSortedLimit; 
+    uint256 public bottlesSortedCounter; 
+    uint256 public bottlesSortedLimit; 
     address [] public plasticBale; 
     address [] public plasticBaleContributorsAddresses; 
     
      //constructor - initilize state variables
     constructor() public{
         status = 'NoStatus'; 
-        caller = msg.sender; // address of the current caller
         bottlesSortedCounter = 0;
     }
     
     //events
     event updateStatusMachine(address plasticBottleAddress, string status, uint time); 
     event updateStatusRecycler(address recycler, address plasticBottleAddress, string status, uint time);
-    event plasticBaleCompleted(address [] plasticBale, address [] plasticBaleContributorsAddresses,  uint256 bottlesInBaleNo, uint time ); 
+    event plasticBaleCompleted(address [] plasticBale, address [] plasticBaleContributorsAddresses,  uint256 bottlesInBaleNo,  uint time ); 
     
     
     modifier sortingMachineOnly (address registerContractAddr, address sellerAddr){
@@ -40,9 +39,9 @@ contract Tracking{
        tempArray = registerSC.getSellerSortingmMachineDetails(sellerAddr); // pass address of sorting facility-seller
       
       
-       for(uint i=0; i< tempArray.length; i++){ //only registered sorting machines can update the status of the bottle 
+       for(uint256 i=0; i< tempArray.length; i++){ //only registered sorting machines can update the status of the bottle 
        
-         if (caller == tempArray[i])
+         if (msg.sender == tempArray[i])
           _;
           
        }
@@ -60,14 +59,14 @@ contract Tracking{
         
     }
     
-    //Key: bottle address
+    //Key: bottle address - bottleToRecycler[BottleAddress] = RecyclerAddress
     mapping(address=>address) bottleToRecycler; 
     
     
     function updateStatusDisposed () public{
-        bottleToRecycler[plasticBottleAddress] = caller; //save recycler's address
+        bottleToRecycler[plasticBottleAddress] = msg.sender; //save recycler's address
         status = 'disposed'; 
-        emit updateStatusRecycler (caller, plasticBottleAddress, status, now);
+        emit updateStatusRecycler (msg.sender, plasticBottleAddress, status, now);
     }
     
     function updateStatusSorted (address registerContractAddr, address sellerAddr) public sortingMachineOnly (registerContractAddr, sellerAddr){
@@ -79,15 +78,14 @@ contract Tracking{
        
        emit updateStatusMachine(plasticBottleAddress, status, now);
       
-      
       if(bottlesSortedCounter == bottlesSortedLimit )
          announcePlasticBaleCompleted(); 
       
     }
     
-    function announcePlasticBaleCompleted() internal {
+    function announcePlasticBaleCompleted() public {
          bottlesSortedCounter =0; 
-         emit plasticBaleCompleted (plasticBale,plasticBaleContributorsAddresses, bottlesSortedLimit, now); 
+         emit plasticBaleCompleted (plasticBale,plasticBaleContributorsAddresses, bottlesSortedLimit,  now); 
         
     }
     
