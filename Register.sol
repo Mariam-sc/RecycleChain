@@ -109,5 +109,10 @@ contract Register{
    function getManufactuererIdentifier(address manufacturerAddress) external view returns (uint){
         return registeredManufacturers[manufacturerAddress].manufacturerIdenfiter; 
    }
+   
+   // to be used in the bottleProductionSC
+   function isManufactuererExist(address addr) external view returns (bool){
+        return(registeredManufacturers[addr].isExist);
+    }
     
 } 
